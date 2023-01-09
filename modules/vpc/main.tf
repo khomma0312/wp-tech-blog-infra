@@ -76,41 +76,93 @@ resource "aws_route_table_association" "private" {
 }
 
 # Security Groups
-resource "aws_security_group" "elb_security_group" {
+resource "aws_security_group" "alb_security_group" {
     vpc_id = data.aws_vpc.vpc.id
-    name = "elb_security_group"
-}
+    name = "alb_security_group"
 
-resource "aws_security_group" "web_server_security_group" {
-    vpc_id = data.aws_vpc.vpc.id
-    name = "web_server_security_group"
-}
-
-resource "aws_security_group" "web_server_security_group_for_elb" {
-    vpc_id = data.aws_vpc.vpc.id
-    name = "web_server_security_group_for_elb"
     ingress {
         from_port = 80
         to_port = 80
         protocol = "tcp"
-        security_groups = [ aws_security_group.elb_security_group.id ]
+        cidr_blocks = ["0.0.0.0/0"]
     }
 
     ingress {
         from_port = 443
         to_port = 443
         protocol = "tcp"
-        security_groups = [ aws_security_group.elb_security_group.id ]
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    egress {
+        from_port        = 0
+        to_port          = 0
+        protocol         = "-1"
+        cidr_blocks      = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = ["::/0"]
+    }
+}
+
+resource "aws_security_group" "web_server_security_group" {
+    vpc_id = data.aws_vpc.vpc.id
+    name = "web_server_security_group"
+
+    egress {
+        from_port        = 0
+        to_port          = 0
+        protocol         = "-1"
+        cidr_blocks      = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = ["::/0"]
+    }
+}
+
+resource "aws_security_group" "web_server_security_group_for_alb" {
+    depends_on = [
+        aws_security_group.alb_security_group
+    ]
+
+    vpc_id = data.aws_vpc.vpc.id
+    name = "web_server_security_group_for_alb"
+
+    ingress {
+        from_port = 80
+        to_port = 80
+        protocol = "tcp"
+        security_groups = [ aws_security_group.alb_security_group.id ]
+    }
+
+    ingress {
+        from_port = 443
+        to_port = 443
+        protocol = "tcp"
+        security_groups = [ aws_security_group.alb_security_group.id ]
+    }
+
+    egress {
+        from_port        = 0
+        to_port          = 0
+        protocol         = "-1"
+        cidr_blocks      = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = ["::/0"]
     }
 }
 
 resource "aws_security_group" "rds_security_group" {
     vpc_id = data.aws_vpc.vpc.id
     name = "rds_security_group"
+
     ingress {
         from_port = 3306
         to_port = 3306
         protocol = "tcp"
         security_groups = [ aws_security_group.web_server_security_group.id ]
+    }
+
+    egress {
+        from_port        = 0
+        to_port          = 0
+        protocol         = "-1"
+        cidr_blocks      = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = ["::/0"]
     }
 }

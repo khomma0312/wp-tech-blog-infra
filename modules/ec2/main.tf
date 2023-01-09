@@ -31,10 +31,17 @@ resource "aws_instance" "web_server" {
     subnet_id = var.public_subnets[0].id
     vpc_security_group_ids = [
         var.web_server_security_group_id,
-        var.web_server_security_group_for_elb_id,
+        var.web_server_security_group_for_alb_id,
     ]
-    # user_data = file("ec2-user-data.sh")
+
+    user_data = file("${path.module}/ec2-user-data.sh")
+    user_data_replace_on_change = true
     iam_instance_profile = aws_iam_instance_profile.web_server_iam_profile.name
+
+    private_dns_name_options {
+        enable_resource_name_dns_a_record = true
+        hostname_type = "ip-name"
+    }
 
     root_block_device {
         encrypted = true

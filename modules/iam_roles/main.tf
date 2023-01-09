@@ -14,7 +14,7 @@ resource "aws_iam_role" "web_server_role" {
     })
 
     managed_policy_arns = [
-        "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
+        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
         "arn:aws:iam::aws:policy/AmazonS3FullAccess",
         aws_iam_policy.ssm_get_parameter_policy.arn
     ]
