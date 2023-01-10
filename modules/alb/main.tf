@@ -35,8 +35,7 @@ resource "aws_lb_listener" "ec2_https" {
 }
 
 resource "aws_lb_target_group" "ec2_https" {
-    # TODO: 一通り構築終わったら"test"を消す
-    name = "${var.project_name}-test-tg"
+    name = "${var.project_name}-tg"
     target_type = "instance"
     port = 80
     protocol = "HTTP"

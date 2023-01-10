@@ -66,7 +66,6 @@ module "cloudfront" {
 module "rds" {
 	source = "../../modules/rds"
 	project_name = var.project_name
-	availability_zone = module.web_server.availability_zone
 	rds_security_group_id = module.vpc.rds_security_group_id
 	private_subnets = module.vpc.private_subnets
 	db_name = var.db_name

@@ -5,7 +5,6 @@ locals {
 resource "aws_db_instance" "rds" {
     allocated_storage               = 20
     apply_immediately               = true
-    availability_zone               = var.availability_zone
     backup_retention_period         = 7
     backup_window                   = "18:00-18:30"
     ca_cert_identifier              = "rds-ca-2019"
