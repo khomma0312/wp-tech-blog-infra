@@ -29,8 +29,29 @@ resource "aws_lb_listener" "ec2_https" {
     certificate_arn   = var.ssl_certificate_arn
 
     default_action {
-        target_group_arn = aws_lb_target_group.ec2_https.arn
+        type = "fixed-response"
+
+        fixed_response {
+            content_type = "text/plain"
+            status_code  = "404"
+        }
+    }
+}
+
+resource "aws_lb_listener_rule" "https_forward_rule" {
+    listener_arn = aws_lb_listener.ec2_https.arn
+    priority     = 1
+
+    action {
         type             = "forward"
+        target_group_arn = aws_lb_target_group.ec2_https.arn
+    }
+
+    condition {
+        http_header {
+            http_header_name = "x-cf-header-secret"
+            values = [ var.cf_header_secret_value ]
+        }
     }
 }
 
@@ -43,7 +64,7 @@ resource "aws_lb_target_group" "ec2_https" {
 
     health_check {
         enabled = true
-        matcher = 302
+        matcher = 200
         path = "/"
     }
 }

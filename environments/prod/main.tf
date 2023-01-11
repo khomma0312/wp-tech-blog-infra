@@ -49,6 +49,7 @@ module "alb" {
 	project_name = var.project_name
 	public_subnets = module.vpc.public_subnets
 	security_group_id = module.vpc.alb_security_group_id
+	cf_header_secret_value = var.cf_header_secret_value
 	ssl_certificate_arn = module.acm.alb_certificate_arn
 	vpc_id = module.vpc.vpc_id
 	instance_ids = module.web_server.instance_ids
